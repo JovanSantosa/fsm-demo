@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Halaman setelah login — FSM Login System Demo" />
+  <title>Home — FSM Login System</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/home.css" />
+</head>
+<body class="home-body">
+  <!-- ========== HEADER ========== -->
+  <header class="app-header">
+    <div class="app-brand">
+      <div class="app-brand-mark">FSM</div>
+      <div class="app-brand-text">
+        <span>Login FSM</span>
+        <small>Interactive Demo</small>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="home-state-pill">
+        <span class="home-state-dot"></span>
+        <span class="home-state-text">S4 · AUTHENTICATED</span>
+      </div>
+      <button type="button" id="theme-toggle" class="btn btn-icon" title="Toggle theme" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <!-- ========== MAIN ========== -->
+  <main class="home-main">
+    <div class="home-content fade-in">
+      <p class="home-eyebrow">Login Successful</p>
+      <h1 class="home-greeting">Welcome, <span id="user-name">User</span>!</h1>
+      <p class="home-subgreeting">You have successfully passed every FSM state and reached <code>S4: AUTHENTICATED</code>.</p>
+
+      <!-- Profile card -->
+      <div class="profile-card">
+        <div class="profile-avatar" id="profile-avatar">?</div>
+        <div class="profile-info">
+          <h2 id="profile-name">—</h2>
+          <div class="profile-meta">
+            <div class="profile-meta-item">
+              <span class="profile-meta-label">Email</span>
+              <span class="profile-meta-value" id="profile-email">—</span>
+            </div>
+            <div class="profile-meta-item">
+              <span class="profile-meta-label">Role</span>
+              <span class="profile-meta-value" id="profile-role">—</span>
+            </div>
+            <div class="profile-meta-item">
+              <span class="profile-meta-label">Last Login</span>
+              <span class="profile-meta-value" id="profile-last-login">—</span>
+            </div>
+            <div class="profile-meta-item">
+              <span class="profile-meta-label">User ID</span>
+              <span class="profile-meta-value text-mono" id="profile-id">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" id="logout-btn" class="btn btn-primary btn-logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Logout</span>
+      </button>
+
+      <p class="home-footnote">Logging out will transition the state to <code>S0: IDLE</code> and return you to the login page.</p>
+    </div>
+  </main>
+
+  <!-- ========== Scripts ========== -->
+  <script src="js/users.js"></script>
+  <script src="js/features.js"></script>
+  <script>
+    // ----- Theme icon injection -----
+    (function () {
+      const sun = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+      const moon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      const saved = localStorage.getItem('fsm-theme') || 'dark';
+      document.documentElement.classList.toggle('light-mode', saved === 'light');
+      const btn = document.getElementById('theme-toggle');
+      if (btn) {
+        btn.innerHTML = saved === 'light' ? moon : sun;
+        btn.addEventListener('click', () => {
+          const isLight = document.documentElement.classList.toggle('light-mode');
+          localStorage.setItem('fsm-theme', isLight ? 'light' : 'dark');
+          btn.innerHTML = isLight ? moon : sun;
+        });
+      }
+    })();
+
+    // ----- Populate profile from sessionStorage -----
+    (function () {
+      const raw = sessionStorage.getItem('fsm-auth-user');
+      if (!raw) {
+        // No auth data — redirect to login
+        window.location.replace('index.html');
+        return;
+      }
+      let user;
+      try { user = JSON.parse(raw); } catch (_) { user = null; }
+      if (!user) {
+        window.location.replace('index.html');
+        return;
+      }
+
+      document.getElementById('user-name').textContent = user.name;
+      document.getElementById('profile-name').textContent = user.name;
+      document.getElementById('profile-email').textContent = user.email;
+      document.getElementById('profile-role').textContent = user.role;
+      document.getElementById('profile-last-login').textContent = user.lastLogin;
+      document.getElementById('profile-id').textContent = '#' + String(user.id).padStart(4, '0');
+
+      const avatar = document.getElementById('profile-avatar');
+      avatar.textContent = user.avatar;
+      const palette = ['#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#3B82F6'];
+      avatar.style.background = `linear-gradient(135deg, ${palette[(user.id - 1) % palette.length]}, ${palette[user.id % palette.length]})`;
+    })();
+
+    // ----- Logout -----
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      sessionStorage.removeItem('fsm-auth-user');
+      // Clear and redirect back to login (FSM resets to S0 on reload)
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

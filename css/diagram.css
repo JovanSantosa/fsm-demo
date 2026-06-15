@@ -1,0 +1,269 @@
+/* =========================================================
+   diagram.css — FSM diagram SVG styles
+   FSM Login System Demo
+   ========================================================= */
+
+.fsm-diagram-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.fsm-svg-container {
+  background: linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  position: relative;
+  overflow: hidden;
+}
+
+.fsm-svg-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+
+.fsm-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- State node ---------- */
+.state-node {
+  cursor: default;
+  transition: transform var(--transition-base);
+}
+
+.state-glow {
+  transition: opacity var(--transition-base);
+  filter: blur(6px);
+}
+
+.state-circle {
+  transition: fill var(--transition-base), stroke-width var(--transition-base);
+}
+
+.state-id {
+  fill: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: fill var(--transition-base);
+}
+
+.state-name {
+  fill: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: fill var(--transition-base);
+}
+
+.state-node.active .state-circle {
+  fill: currentColor;
+  stroke-width: 3;
+  animation: nodePulse 1.6s var(--anim-ease) infinite;
+}
+
+.state-node.active .state-glow {
+  opacity: 0.45 !important;
+  animation: glowPulse 1.6s var(--anim-ease) infinite;
+}
+
+.state-node.active .state-id,
+.state-node.active .state-name {
+  fill: white;
+  font-weight: 700;
+}
+
+.state-node.active {
+  color: var(--color-primary);
+}
+
+/* Apply per-state color to active node via state class */
+.state-S0.active { color: var(--state-idle); }
+.state-S1.active { color: var(--state-validating); }
+.state-S2.active { color: var(--state-email-not-found); }
+.state-S3.active { color: var(--state-wrong-password); }
+.state-S4.active { color: var(--state-authenticated); }
+.state-S5.active { color: var(--state-locked); }
+.state-S6.active { color: var(--state-cooldown); }
+
+@keyframes nodePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.55; }
+}
+
+/* ---------- Transition paths ---------- */
+.transition {
+  transition: stroke var(--transition-base), stroke-width var(--transition-base);
+}
+
+.transition.active {
+  stroke: var(--color-primary);
+  filter: drop-shadow(0 0 6px var(--color-primary));
+  animation: pathPulse 1.4s var(--anim-ease) infinite;
+}
+
+@keyframes pathPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ---------- Transition labels ---------- */
+.transition-label-text {
+  fill: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  paint-order: stroke;
+  stroke: var(--color-surface);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  transition: fill var(--transition-base);
+}
+
+.transition-label.active .transition-label-text {
+  fill: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ---------- State badge (top-left of SVG) ---------- */
+.state-badge-bg {
+  fill: var(--color-surface);
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: 0.95;
+}
+
+.state-badge-dot {
+  transition: fill var(--transition-base);
+}
+
+.state-badge-text {
+  fill: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Legend ---------- */
+.fsm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.fsm-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.fsm-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fsm-legend-id {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-right: 2px;
+}
+
+/* ---------- State history panel ---------- */
+.state-history-panel {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.state-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.state-history-list {
+  max-height: 120px;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1.7;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.state-history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.state-history-list::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+
+.state-history-entry {
+  display: flex;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+  padding: 2px 0;
+  animation: fadeIn 250ms var(--anim-ease);
+}
+
+.state-history-entry:first-child {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.state-history-time {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.state-history-arrow {
+  color: var(--color-primary);
+  margin: 0 2px;
+}
+
+.state-history-empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
